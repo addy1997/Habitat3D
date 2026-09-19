@@ -16,6 +16,7 @@ import { RoomUploadModal } from './components/RoomUploadModal';
 import { SpatialChatbot } from './components/SpatialChatbot';
 import { Login } from './components/Login';
 import { NeRFPipelineModal } from './components/NeRFPipelineModal';
+import { FloorPlanModal } from './components/FloorPlanModal';
 
 export default function App() {
   const [activeRoom, setActiveRoom] = useState<SampleRoom>(SAMPLE_ROOMS[0]);
@@ -33,6 +34,7 @@ export default function App() {
   const [isLogfireOpen, setIsLogfireOpen] = useState<boolean>(false);
   const [isModalGpuOpen, setIsModalGpuOpen] = useState<boolean>(false);
   const [isNeRFModalOpen, setIsNeRFModalOpen] = useState<boolean>(false);
+  const [isFloorPlanOpen, setIsFloorPlanOpen] = useState<boolean>(false);
   const [isChatOpen, setIsChatOpen] = useState<boolean>(false);
   const [isUploadOpen, setIsUploadOpen] = useState<boolean>(false);
 
@@ -260,6 +262,7 @@ export default function App() {
         logfireActive={true}
         onOpenLogfire={() => setIsLogfireOpen(true)}
         onOpenNeRF={() => setIsNeRFModalOpen(true)}
+        onOpenFloorPlan={() => setIsFloorPlanOpen(true)}
         onOpenModalGpu={() => setIsModalGpuOpen(true)}
         onOpenChat={() => setIsChatOpen(true)}
         onOpenUpload={() => setIsUploadOpen(true)}
@@ -287,6 +290,7 @@ export default function App() {
           isGeneratingVariantImage={isGeneratingVariantImage}
           detectedFloorPolygon={analysis.usable_floor_polygon}
           architecturalFeatures={analysis.architectural_features}
+          onOpenFloorPlan={() => setIsFloorPlanOpen(true)}
         />
 
         {/* In-Scene Expanded Hotspot Dimension Card */}
@@ -340,6 +344,15 @@ export default function App() {
         onSelectSampleRoom={handleSelectSample}
         onUploadCustomRoom={handleUploadCustomRoom}
         isProcessing={isProcessing}
+      />
+
+      {/* 2D Architectural CAD Floor Plan Modal */}
+      <FloorPlanModal
+        isOpen={isFloorPlanOpen}
+        onClose={() => setIsFloorPlanOpen(false)}
+        currentVariant={currentVariant}
+        roomName={activeRoom.name}
+        dimensionsText={activeRoom.dimensionsText}
       />
 
       {/* Multi-turn Gemini Spatial Staging Chatbot Drawer */}

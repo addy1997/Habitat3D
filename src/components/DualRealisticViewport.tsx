@@ -28,6 +28,11 @@ import {
   Loader2,
   ShieldCheck,
   Cpu,
+  Sun,
+  Moon,
+  Sunset,
+  Sunrise,
+  FileSpreadsheet,
 } from 'lucide-react';
 
 export type ViewDisplayMode = 'side-by-side' | 'split-slider' | 'studio-renders' | 'single-staged';
@@ -64,6 +69,7 @@ interface DualRealisticViewportProps {
   onOpenNeRFModal?: () => void;
   onSelectCameraPose?: (pose: CameraPose) => void;
   targetCameraPose?: CameraPose | null;
+  onOpenFloorPlan?: () => void;
 }
 
 export const DualRealisticViewport: React.FC<DualRealisticViewportProps> = ({
@@ -86,7 +92,11 @@ export const DualRealisticViewport: React.FC<DualRealisticViewportProps> = ({
   onOpenNeRFModal,
   onSelectCameraPose,
   targetCameraPose,
+  onOpenFloorPlan,
 }) => {
+  // Daylight & Sun Position Simulation: 'morning' (8:30 AM), 'noon' (1:00 PM), 'golden' (6:00 PM), 'night' (10:00 PM)
+  const [timeOfDay, setTimeOfDay] = useState<'morning' | 'noon' | 'golden' | 'night'>('noon');
+
   // Selected angle image index if multiple images exist
   const [selectedAngleIndex, setSelectedAngleIndex] = useState<number>(0);
 
@@ -611,6 +621,89 @@ export const DualRealisticViewport: React.FC<DualRealisticViewportProps> = ({
     updateHotspotProjections();
   }, [renderEngine, currentVariant, updateHotspotProjections]);
 
+  // Dynamic Daylight & Sun Position Simulation Effect
+  useEffect(() => {
+    const applyLightingToScene = (scene: THREE.Scene | null) => {
+      if (!scene) return;
+      const sun = scene.getObjectByName('sun_directional_light') as THREE.DirectionalLight | null;
+      const hemi = scene.getObjectByName('hemi_ambient_light') as THREE.HemisphereLight | null;
+      const ambient = scene.getObjectByName('ambient_fill_light') as THREE.AmbientLight | null;
+
+      if (timeOfDay === 'morning') {
+        // Sunrise / 8:30 AM: Low warm angled golden-pink sunlight from East
+        if (sun) {
+          sun.color.set(0xffdfba);
+          sun.intensity = 2.4;
+          sun.position.set(-5.5, 2.2, 3.0);
+        }
+        if (hemi) {
+          hemi.color.set(0xffe8d6);
+          hemi.groundColor.set(0x3d3024);
+          hemi.intensity = 0.9;
+        }
+        if (ambient) {
+          ambient.color.set(0xffeedd);
+          ambient.intensity = 0.4;
+        }
+        scene.background = new THREE.Color(0x16131b);
+      } else if (timeOfDay === 'noon') {
+        // High Noon / 1:00 PM: Bright neutral 5500K daylight directly overhead
+        if (sun) {
+          sun.color.set(0xfff8f0);
+          sun.intensity = 2.5;
+          sun.position.set(2.0, 5.5, 1.2);
+        }
+        if (hemi) {
+          hemi.color.set(0xe0f2fe);
+          hemi.groundColor.set(0x44382c);
+          hemi.intensity = 1.0;
+        }
+        if (ambient) {
+          ambient.color.set(0xffffff);
+          ambient.intensity = 0.45;
+        }
+        scene.background = new THREE.Color(0x111214);
+      } else if (timeOfDay === 'golden') {
+        // Golden Hour / 6:30 PM: Deep warm amber sunset, long dramatic shadows
+        if (sun) {
+          sun.color.set(0xfb923c);
+          sun.intensity = 2.6;
+          sun.position.set(5.8, 1.8, -1.0);
+        }
+        if (hemi) {
+          hemi.color.set(0xfed7aa);
+          hemi.groundColor.set(0x291d18);
+          hemi.intensity = 0.75;
+        }
+        if (ambient) {
+          ambient.color.set(0xf97316);
+          ambient.intensity = 0.35;
+        }
+        scene.background = new THREE.Color(0x1c120c);
+      } else if (timeOfDay === 'night') {
+        // Evening / Night / 10:00 PM: Cool moonlight + cozy warm indoor accent illumination
+        if (sun) {
+          sun.color.set(0x93c5fd);
+          sun.intensity = 0.4;
+          sun.position.set(-2.0, 4.0, 4.0);
+        }
+        if (hemi) {
+          hemi.color.set(0x1e293b);
+          hemi.groundColor.set(0x0f172a);
+          hemi.intensity = 0.35;
+        }
+        if (ambient) {
+          ambient.color.set(0xfef08a);
+          ambient.intensity = 0.65; // Warm indoor floor lamps / pendants glow
+        }
+        scene.background = new THREE.Color(0x080b12);
+      }
+    };
+
+    applyLightingToScene(leftSceneRef.current);
+    applyLightingToScene(rightSceneRef.current);
+  }, [timeOfDay]);
+
   // Camera presets for multi-angle inspection
   const setCameraPreset = (preset: 'perspective' | 'top' | 'eye') => {
     setActiveCameraPreset(preset);
@@ -808,6 +901,79 @@ export const DualRealisticViewport: React.FC<DualRealisticViewportProps> = ({
               <span className="px-1.5 py-0.2 rounded text-[10px] bg-cyan-950 text-cyan-300 border border-cyan-800">
                 {nerfMetadata?.psnr ? `${nerfMetadata.psnr.toFixed(1)} dB` : '35.2 dB'}
               </span>
+            </button>
+          )}
+
+          {/* Dynamic Daylight Simulator Toggle */}
+          <div className="hidden xl:flex items-center gap-1 p-0.5 rounded-lg bg-neutral-900 border border-neutral-800 text-[11px] font-mono">
+            <span className="text-[10px] text-neutral-500 px-1.5 flex items-center gap-1">
+              <Sun className="w-3 h-3 text-amber-400" />
+              Sun:
+            </span>
+            <button
+              type="button"
+              onClick={() => setTimeOfDay('morning')}
+              className={`px-2 py-1 rounded transition-all flex items-center gap-1 ${
+                timeOfDay === 'morning'
+                  ? 'bg-amber-950/80 text-amber-300 font-bold border border-amber-500/50'
+                  : 'text-neutral-400 hover:text-neutral-200'
+              }`}
+              title="Morning Sunlight (8:30 AM) - Soft Warm Angled East Light"
+            >
+              <Sunrise className="w-3 h-3" />
+              <span>8:30A</span>
+            </button>
+            <button
+              type="button"
+              onClick={() => setTimeOfDay('noon')}
+              className={`px-2 py-1 rounded transition-all flex items-center gap-1 ${
+                timeOfDay === 'noon'
+                  ? 'bg-cyan-950/80 text-cyan-300 font-bold border border-cyan-500/50'
+                  : 'text-neutral-400 hover:text-neutral-200'
+              }`}
+              title="High Noon Daylight (1:00 PM) - Crisp Natural Overhead Light"
+            >
+              <Sun className="w-3 h-3 text-cyan-400" />
+              <span>1:00P</span>
+            </button>
+            <button
+              type="button"
+              onClick={() => setTimeOfDay('golden')}
+              className={`px-2 py-1 rounded transition-all flex items-center gap-1 ${
+                timeOfDay === 'golden'
+                  ? 'bg-orange-950/80 text-orange-300 font-bold border border-orange-500/50'
+                  : 'text-neutral-400 hover:text-neutral-200'
+              }`}
+              title="Golden Hour Sunset (6:30 PM) - Dramatic Warm Amber Glow"
+            >
+              <Sunset className="w-3 h-3 text-orange-400" />
+              <span>6:30P</span>
+            </button>
+            <button
+              type="button"
+              onClick={() => setTimeOfDay('night')}
+              className={`px-2 py-1 rounded transition-all flex items-center gap-1 ${
+                timeOfDay === 'night'
+                  ? 'bg-indigo-950/80 text-indigo-300 font-bold border border-indigo-500/50'
+                  : 'text-neutral-400 hover:text-neutral-200'
+              }`}
+              title="Evening / Night Ambience (10:00 PM) - Moonlight with Warm Indoor Lamps"
+            >
+              <Moon className="w-3 h-3 text-indigo-400" />
+              <span>10:00P</span>
+            </button>
+          </div>
+
+          {/* 2D Architectural Floor Plan Generator Button */}
+          {onOpenFloorPlan && (
+            <button
+              type="button"
+              onClick={onOpenFloorPlan}
+              className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-cyan-950/60 hover:bg-cyan-900/80 border border-cyan-500/40 text-cyan-300 hover:text-white transition-all text-xs font-mono shadow-sm"
+              title="Open 2D Architectural CAD Floor Plan with Clearance & Walkway Verification"
+            >
+              <FileSpreadsheet className="w-3.5 h-3.5 text-cyan-400" />
+              <span className="hidden md:inline font-semibold">2D CAD Floor Plan</span>
             </button>
           )}
 

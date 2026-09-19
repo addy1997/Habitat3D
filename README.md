@@ -51,6 +51,20 @@ Each style generates **completely unique** 3D geometry — not just colour swaps
 - Full **OrbitControls** — drag to orbit, scroll to zoom, right-click to pan
 - Procedural meshes with **contact shadows**, ambient occlusion, and **multi-light rigs**
 
+### 📐 2D Architectural CAD Floor Plan Generator
+- One-click switch to precise **Scale 1:50 2D Architectural Blueprint** view
+- **ADA Egress & Clearance zones (75cm+ buffer)** calculated live around every furniture element
+- Door and window swing arcs with natural daylight ingress direction
+- Dimension lines with metric & imperial room calculations
+- **One-click Vector CAD (.SVG) Export** for architects, interior designers, and moving contractors
+
+### ☀️ Dynamic Daylight & Sun Position Simulator
+- Real-time **solar path simulation** directly altering Three.js directional and hemisphere lighting:
+  - **8:30 AM (Morning)**: Soft warm angled East light (color temp 3800K)
+  - **1:00 PM (High Noon)**: Crisp neutral overhead sunlight (5500K)
+  - **6:30 PM (Golden Hour)**: Dramatic low-angle amber sunset with elongated soft shadows
+  - **10:00 PM (Night Ambience)**: Cool exterior moonlight + cozy warm indoor accent illumination
+
 ### 🔬 NeRF & 3D Gaussian Splatting Pipeline
 - Camera frustum visualisation across multiple pose estimates
 - Gaussian Splat controls (scale, opacity, spherical harmonics toggle)

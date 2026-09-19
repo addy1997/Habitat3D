@@ -309,6 +309,7 @@ export function buildArchitecturalRoom(options: RoomBuildOptions = {}): {
 
   // --- 6. Lighting System ---
   const sunLight = new THREE.DirectionalLight(0xfff5e6, 2.2);
+  sunLight.name = 'sun_directional_light';
   sunLight.position.set(5.0, 4.2, 1.5);
   sunLight.target.position.set(0, 0.4, 0);
   sunLight.castShadow = true;
@@ -326,10 +327,12 @@ export function buildArchitecturalRoom(options: RoomBuildOptions = {}): {
   lightsGroup.add(sunLight.target);
 
   const hemiLight = new THREE.HemisphereLight(0xedf4fc, 0x483a2c, 0.85);
+  hemiLight.name = 'hemi_ambient_light';
   hemiLight.position.set(0, 4, 0);
   lightsGroup.add(hemiLight);
 
   const ambientFill = new THREE.AmbientLight(0xfff8ee, 0.45);
+  ambientFill.name = 'ambient_fill_light';
   lightsGroup.add(ambientFill);
 
   return { roomGroup, lightsGroup };

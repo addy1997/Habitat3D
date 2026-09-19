@@ -1,11 +1,12 @@
 import React from 'react';
-import { Activity, Cpu, Sparkles, MessageSquare, Upload, Maximize2, RotateCcw, Box } from 'lucide-react';
+import { Activity, Cpu, Sparkles, MessageSquare, Upload, Maximize2, RotateCcw, Box, FileSpreadsheet } from 'lucide-react';
 
 interface TopBarProps {
   logfireActive: boolean;
   onOpenLogfire: () => void;
   onOpenModalGpu: () => void;
   onOpenNeRF?: () => void;
+  onOpenFloorPlan?: () => void;
   onOpenChat: () => void;
   onOpenUpload: () => void;
   onResetCamera: () => void;
@@ -20,6 +21,7 @@ export const TopBar: React.FC<TopBarProps> = ({
   onOpenLogfire,
   onOpenModalGpu,
   onOpenNeRF,
+  onOpenFloorPlan,
   onOpenChat,
   onOpenUpload,
   onResetCamera,
@@ -71,6 +73,20 @@ export const TopBar: React.FC<TopBarProps> = ({
             <span className="px-1.5 py-0.2 rounded text-[10px] bg-cyan-900/90 text-cyan-200 border border-cyan-700">
               35.2 dB
             </span>
+          </button>
+        )}
+
+        {/* 2D Architectural CAD Floor Plan Button */}
+        {onOpenFloorPlan && (
+          <button
+            id="btn-open-floorplan-modal"
+            type="button"
+            onClick={onOpenFloorPlan}
+            className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-mono bg-cyan-950/70 hover:bg-cyan-900/80 border border-cyan-500/50 text-cyan-300 hover:text-white transition-all"
+            title="Open 2D Architectural CAD Floor Plan with Walkway & Clearance Analysis"
+          >
+            <FileSpreadsheet className="w-3.5 h-3.5 text-cyan-400" />
+            <span className="hidden sm:inline">2D Floor Plan</span>
           </button>
         )}
 
