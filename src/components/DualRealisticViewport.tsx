@@ -285,12 +285,9 @@ export const DualRealisticViewport: React.FC<DualRealisticViewportProps> = ({
       : null;
 
   const emptyPhoto = currentAnglePhoto || uploadedImageUrl || emptyImageUrl || currentVariant.realistic_image_url;
-  // If user uploaded a custom room (base64 data URL), show it directly.
-  // Only fall back to bundled realistic_image_url for default sample rooms (http/https URLs).
-  const hasUserUpload = !!(uploadedImageUrl && uploadedImageUrl.startsWith('data:'));
-  const stagedPhoto = hasUserUpload
-    ? emptyPhoto  // show the uploaded image on both sides; no AI-staged version exists yet
-    : (currentVariant.realistic_image_url || emptyPhoto);
+  // If user uploaded a custom room and AI synthesized a realistic_image_url for this variant, use it!
+  // Otherwise fall back to currentVariant.realistic_image_url (for presets) or emptyPhoto
+  const stagedPhoto = currentVariant.realistic_image_url || emptyPhoto;
 
   const is3DActive = renderEngine === '3d-orbit' || renderEngine === 'gaussian-splats';
 
@@ -620,6 +617,15 @@ export const DualRealisticViewport: React.FC<DualRealisticViewportProps> = ({
     scene.add(newFurniture);
     updateHotspotProjections();
   }, [renderEngine, currentVariant, updateHotspotProjections]);
+
+  // Immediately toggle splat mesh vs standard 3D room/furniture visibility whenever renderEngine switches
+  useEffect(() => {
+    const isSplats = renderEngine === 'gaussian-splats';
+    if (leftSplatsRef.current) leftSplatsRef.current.visible = isSplats;
+    if (roomGroupRef.current) roomGroupRef.current.visible = !isSplats;
+    if (rightSplatsRef.current) rightSplatsRef.current.visible = isSplats;
+    if (furnitureGroupRef.current) furnitureGroupRef.current.visible = true; // staged furniture always visible in 3D & splat modes
+  }, [renderEngine]);
 
   // Dynamic Daylight & Sun Position Simulation Effect
   useEffect(() => {
