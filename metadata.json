@@ -1,0 +1,6 @@
+{
+  "name": "Habitat 3D",
+  "description": "Agentic spatial staging engine using Pydantic AI orchestrator, Gemini Multimodal spatial reasoning, Logfire tracing, and Modal parallel GPU workers for 3D Gaussian Splatting.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
