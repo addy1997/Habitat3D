@@ -5,6 +5,7 @@ interface TopBarProps {
   logfireActive: boolean;
   onOpenLogfire: () => void;
   onOpenModalGpu: () => void;
+  onOpenNeRF?: () => void;
   onOpenChat: () => void;
   onOpenUpload: () => void;
   onResetCamera: () => void;
@@ -18,6 +19,7 @@ export const TopBar: React.FC<TopBarProps> = ({
   logfireActive,
   onOpenLogfire,
   onOpenModalGpu,
+  onOpenNeRF,
   onOpenChat,
   onOpenUpload,
   onResetCamera,
@@ -36,8 +38,8 @@ export const TopBar: React.FC<TopBarProps> = ({
             HABITAT 3D
           </span>
         </div>
-        <div className="hidden md:flex items-center px-2 py-0.5 rounded text-[11px] font-mono bg-neutral-900 border border-neutral-800 text-neutral-400">
-          v2.4 · 3D Gaussian Splats
+        <div className="hidden md:flex items-center px-2 py-0.5 rounded text-[11px] font-mono bg-neutral-900 border border-neutral-800 text-cyan-400">
+          Agentic 3DGS · v2.4
         </div>
         <div className="hidden lg:flex items-center text-xs text-neutral-400 truncate max-w-xs font-mono">
           <span className="text-neutral-600 mr-1">/</span>
@@ -55,6 +57,23 @@ export const TopBar: React.FC<TopBarProps> = ({
 
       {/* Right Controls & Status Badges */}
       <div className="flex items-center gap-2 sm:gap-3">
+        {/* NeRF 3DGS Engine Button */}
+        {onOpenNeRF && (
+          <button
+            id="btn-open-nerf-modal"
+            type="button"
+            onClick={onOpenNeRF}
+            className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-mono bg-cyan-950/60 hover:bg-cyan-900/70 border border-cyan-500/40 text-cyan-300 hover:text-white transition-all"
+            title="Inspect NeRF Neural Radiance Fields & 3D Gaussian Splats"
+          >
+            <Sparkles className="w-3.5 h-3.5 text-cyan-400" />
+            <span className="hidden sm:inline">NeRF 3DGS</span>
+            <span className="px-1.5 py-0.2 rounded text-[10px] bg-cyan-900/90 text-cyan-200 border border-cyan-700">
+              35.2 dB
+            </span>
+          </button>
+        )}
+
         {/* Wireframe Bounding Box Toggle */}
         <button
           id="btn-toggle-bounding-boxes"

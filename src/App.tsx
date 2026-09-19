@@ -14,6 +14,8 @@ import { LogfireTraceModal } from './components/LogfireTraceModal';
 import { ModalComputeModal } from './components/ModalComputeModal';
 import { RoomUploadModal } from './components/RoomUploadModal';
 import { SpatialChatbot } from './components/SpatialChatbot';
+import { Login } from './components/Login';
+import { NeRFPipelineModal } from './components/NeRFPipelineModal';
 
 export default function App() {
   const [activeRoom, setActiveRoom] = useState<SampleRoom>(SAMPLE_ROOMS[0]);
@@ -25,12 +27,23 @@ export default function App() {
   const [isGeneratingVariantImage, setIsGeneratingVariantImage] = useState<boolean>(false);
   const [cameraResetTrigger, setCameraResetTrigger] = useState<number>(0);
   const [isProcessing, setIsProcessing] = useState<boolean>(false);
+  const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
 
   // Modals & Drawers
   const [isLogfireOpen, setIsLogfireOpen] = useState<boolean>(false);
   const [isModalGpuOpen, setIsModalGpuOpen] = useState<boolean>(false);
+  const [isNeRFModalOpen, setIsNeRFModalOpen] = useState<boolean>(false);
   const [isChatOpen, setIsChatOpen] = useState<boolean>(false);
   const [isUploadOpen, setIsUploadOpen] = useState<boolean>(false);
+
+  const [nerfRenderSettings, setNerfRenderSettings] = useState<NeRFRenderSettings>({
+    renderMode: '3d-orbit',
+    splatScale: 0.045,
+    splatOpacity: 0.85,
+    showCameraFrustums: true,
+    enableSphericalHarmonics: true,
+  });
+
 
   // Live Pydantic Logfire Traces & Modal GPU Workers State
   const [logfireTraces, setLogfireTraces] = useState<LogfireSpan[]>([
@@ -238,12 +251,15 @@ export default function App() {
     }
   };
 
+  if (!isAuthenticated) return <Login onLogin={() => setIsAuthenticated(true)} />;
+
   return (
     <div className="relative w-screen h-screen overflow-hidden bg-neutral-950 text-neutral-100 flex flex-col font-sans select-none">
       {/* Top Bar with Brand, System Status & Triggers */}
       <TopBar
         logfireActive={true}
         onOpenLogfire={() => setIsLogfireOpen(true)}
+        onOpenNeRF={() => setIsNeRFModalOpen(true)}
         onOpenModalGpu={() => setIsModalGpuOpen(true)}
         onOpenChat={() => setIsChatOpen(true)}
         onOpenUpload={() => setIsUploadOpen(true)}
@@ -304,6 +320,13 @@ export default function App() {
       />
 
       {/* Modal 3x GPU Serverless Cluster Monitor Modal */}
+      <NeRFPipelineModal
+        isOpen={isNeRFModalOpen}
+        onClose={() => setIsNeRFModalOpen(false)}
+        renderSettings={nerfRenderSettings}
+        onUpdateRenderSettings={(s) => setNerfRenderSettings(prev => ({ ...prev, ...s }))}
+      />
+
       <ModalComputeModal
         isOpen={isModalGpuOpen}
         onClose={() => setIsModalGpuOpen(false)}

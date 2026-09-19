@@ -22,9 +22,16 @@ export const StyleSwitcher: React.FC<StyleSwitcherProps> = ({
     return <BedDouble className="w-4 h-4" />;
   };
 
-  const getEmoji = (title: string) => {
+    const getEmoji = (title: string) => {
     const lower = title.toLowerCase();
     if (lower.includes('office')) return '💼';
+    if (lower.includes('scandinavian')) return '🌿';
+    if (lower.includes('french')) return '⚜️';
+    if (lower.includes('industrial')) return '⚙️';
+    if (lower.includes('japandi')) return '🍵';
+    if (lower.includes('mid-century')) return '📻';
+    if (lower.includes('bohemian') || lower.includes('boho')) return '🧶';
+    if (lower.includes('coastal') || lower.includes('hampton')) return '🌊';
     if (lower.includes('nursery') || lower.includes('kid')) return '👶';
     return '🛏️';
   };
@@ -40,7 +47,7 @@ export const StyleSwitcher: React.FC<StyleSwitcherProps> = ({
       {/* Floating Style Action Pills */}
       <div
         id="floating-style-switcher"
-        className="flex items-center gap-1.5 sm:gap-2 p-1.5 rounded-2xl bg-neutral-950/85 backdrop-blur-xl border border-neutral-800/90 shadow-2xl shadow-black/80"
+        className="flex items-center gap-1.5 sm:gap-2 p-1.5 rounded-2xl flex-wrap justify-center max-w-4xl bg-neutral-950/85 backdrop-blur-xl border border-neutral-800/90 shadow-2xl shadow-black/80"
       >
         {variants.map((v, index) => {
           const isSelected = index === selectedVariantIndex;

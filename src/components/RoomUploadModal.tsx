@@ -61,6 +61,7 @@ export const RoomUploadModal: React.FC<RoomUploadModalProps> = ({
   const [dragOver, setDragOver] = useState(false);
   const [uploadedImages, setUploadedImages] = useState<UploadedImageItem[]>([]);
   const [activePreviewIndex, setActivePreviewIndex] = useState<number>(0);
+  const [selectedRoomType, setSelectedRoomType] = useState<string>('Living Room / Lounge');
   const [roomTitle, setRoomTitle] = useState<string>('');
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [geminiAnalysis, setGeminiAnalysis] = useState<any | null>(null);
@@ -169,6 +170,9 @@ export const RoomUploadModal: React.FC<RoomUploadModalProps> = ({
       const data = await res.json();
       if (data.analysis) {
         setGeminiAnalysis(data.analysis);
+        if (data.analysis.room_type) {
+          setSelectedRoomType(data.analysis.room_type);
+        }
       }
     } catch (e) {
       console.error('Image analysis error', e);
@@ -180,9 +184,10 @@ export const RoomUploadModal: React.FC<RoomUploadModalProps> = ({
   const handleStageThisRoom = async () => {
     if (uploadedImages.length === 0) return;
     const primary = uploadedImages.find((img) => img.isPrimary) || uploadedImages[0];
+    const targetRoomName = roomTitle || selectedRoomType || 'Custom Living Room';
     await onUploadCustomRoom(
       primary.dataUrl,
-      roomTitle || primary.name || 'Uploaded Room Space',
+      targetRoomName,
       uploadedImages
     );
     onClose();
@@ -327,49 +332,82 @@ export const RoomUploadModal: React.FC<RoomUploadModalProps> = ({
           {/* Uploaded Gallery Grid & Active Inspector */}
           {uploadedImages.length > 0 && (
             <div className="p-4 rounded-xl bg-neutral-900/80 border border-neutral-800 space-y-4">
-              {/* Header with Title Input & Count */}
-              <div className="flex flex-col sm:flex-row gap-3 sm:items-center justify-between pb-3 border-b border-neutral-800">
-                <div className="flex-1">
-                  <div className="text-[10px] text-neutral-400 uppercase tracking-wider mb-1 flex items-center gap-1.5">
-                    <Camera className="w-3.5 h-3.5 text-cyan-400" />
-                    <span>Uploaded Perspectives ({uploadedImages.length} Image{uploadedImages.length > 1 ? 's' : ''})</span>
+              {/* Target Room Type Selector & Title */}
+              <div className="space-y-3 pb-3 border-b border-neutral-800">
+                <div className="flex flex-col sm:flex-row gap-3 sm:items-center justify-between">
+                  <div>
+                    <span className="text-[10px] text-neutral-400 uppercase tracking-wider block mb-1 font-semibold">
+                      Target Staging Room Type
+                    </span>
+                    <div className="flex flex-wrap items-center gap-1.5">
+                      {[
+                        'Living Room / Lounge',
+                        'Master Bedroom Suite',
+                        'Executive Home Office',
+                        'Dining Room',
+                        'Nursery / Kids Room',
+                        'Open Studio / Flex',
+                      ].map((t) => (
+                        <button
+                          key={t}
+                          type="button"
+                          onClick={() => setSelectedRoomType(t)}
+                          className={`px-2.5 py-1 rounded-lg text-xs font-mono transition-all ${
+                            selectedRoomType === t
+                              ? 'bg-cyan-500 text-neutral-950 font-bold shadow'
+                              : 'bg-neutral-950 hover:bg-neutral-800 text-neutral-300 border border-neutral-800'
+                          }`}
+                        >
+                          {t}
+                        </button>
+                      ))}
+                    </div>
                   </div>
-                  <input
-                    type="text"
-                    value={roomTitle}
-                    onChange={(e) => setRoomTitle(e.target.value)}
-                    placeholder="e.g. Master Bedroom Suite, Living Loft..."
-                    className="w-full sm:w-80 px-3 py-1.5 rounded-lg bg-neutral-950 border border-neutral-800 text-xs text-white placeholder-neutral-500 focus:outline-none focus:border-cyan-500 font-sans"
-                  />
                 </div>
 
-                <div className="flex items-center gap-2">
-                  <button
-                    type="button"
-                    onClick={() => fileInputRef.current?.click()}
-                    className="flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs bg-neutral-800 hover:bg-neutral-700 text-neutral-200 border border-neutral-700 transition-colors"
-                  >
-                    <Plus className="w-3.5 h-3.5 text-cyan-400" />
-                    <span>Add More Angles</span>
-                  </button>
-                  <button
-                    type="button"
-                    onClick={handleAnalyzeWithGemini}
-                    disabled={isAnalyzing}
-                    className="flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs bg-neutral-800 hover:bg-neutral-700 text-cyan-300 border border-cyan-800/50 transition-colors"
-                  >
-                    <Sparkles className="w-3.5 h-3.5 text-cyan-400" />
-                    <span>{isAnalyzing ? 'Analyzing Angles...' : 'Analyze with Gemini AI'}</span>
-                  </button>
-                  <button
-                    type="button"
-                    onClick={handleStageThisRoom}
-                    disabled={isProcessing}
-                    className="flex items-center gap-1.5 px-4 py-2 rounded-lg text-xs bg-cyan-500 hover:bg-cyan-400 text-neutral-950 font-semibold shadow-md transition-colors"
-                  >
-                    <span>{isProcessing ? 'Synthesizing...' : `Stage This Room (${uploadedImages.length})`}</span>
-                    <ArrowRight className="w-3.5 h-3.5" />
-                  </button>
+                <div className="flex flex-col sm:flex-row gap-3 sm:items-center justify-between pt-1">
+                  <div className="flex-1">
+                    <div className="text-[10px] text-neutral-400 uppercase tracking-wider mb-1 flex items-center gap-1.5">
+                      <Camera className="w-3.5 h-3.5 text-cyan-400" />
+                      <span>Custom Room Title &amp; Angles ({uploadedImages.length} Image{uploadedImages.length > 1 ? 's' : ''})</span>
+                    </div>
+                    <input
+                      type="text"
+                      value={roomTitle}
+                      onChange={(e) => setRoomTitle(e.target.value)}
+                      placeholder={`e.g. ${selectedRoomType}...`}
+                      className="w-full sm:w-80 px-3 py-1.5 rounded-lg bg-neutral-950 border border-neutral-800 text-xs text-white placeholder-neutral-500 focus:outline-none focus:border-cyan-500 font-sans"
+                    />
+                  </div>
+
+                  <div className="flex items-center gap-2">
+                    <button
+                      type="button"
+                      onClick={() => fileInputRef.current?.click()}
+                      className="flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs bg-neutral-800 hover:bg-neutral-700 text-neutral-200 border border-neutral-700 transition-colors"
+                    >
+                      <Plus className="w-3.5 h-3.5 text-cyan-400" />
+                      <span>Add More Angles</span>
+                    </button>
+                    <button
+                      type="button"
+                      onClick={handleAnalyzeWithGemini}
+                      disabled={isAnalyzing}
+                      className="flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs bg-neutral-800 hover:bg-neutral-700 text-cyan-300 border border-cyan-800/50 transition-colors"
+                    >
+                      <Sparkles className="w-3.5 h-3.5 text-cyan-400" />
+                      <span>{isAnalyzing ? 'Analyzing Angles...' : 'Analyze with Gemini AI'}</span>
+                    </button>
+                    <button
+                      type="button"
+                      onClick={handleStageThisRoom}
+                      disabled={isProcessing}
+                      className="flex items-center gap-1.5 px-4 py-2 rounded-lg text-xs bg-cyan-500 hover:bg-cyan-400 text-neutral-950 font-semibold shadow-md transition-colors"
+                    >
+                      <span>{isProcessing ? 'Synthesizing 3D Room...' : `Stage 3D Room (${uploadedImages.length})`}</span>
+                      <ArrowRight className="w-3.5 h-3.5" />
+                    </button>
+                  </div>
                 </div>
               </div>
 

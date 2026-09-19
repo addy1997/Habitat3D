@@ -219,3 +219,102 @@ export function getPlasterWallTexture(): THREE.CanvasTexture {
   textureCache['plaster_wall'] = texture;
   return texture;
 }
+
+/**
+ * Procedural luxury marble texture
+ */
+export function getMarbleTexture(): THREE.CanvasTexture {
+  if (textureCache['marble_stone']) return textureCache['marble_stone'];
+
+  const canvas = document.createElement('canvas');
+  canvas.width = 512;
+  canvas.height = 512;
+  const ctx = canvas.getContext('2d')!;
+
+  ctx.fillStyle = '#F5F5F7';
+  ctx.fillRect(0, 0, 512, 512);
+
+  // Marble veining
+  ctx.strokeStyle = 'rgba(80, 85, 95, 0.25)';
+  ctx.lineWidth = 3;
+  for (let v = 0; v < 6; v++) {
+    ctx.beginPath();
+    let x = (v * 90) % 512;
+    let y = 0;
+    ctx.moveTo(x, y);
+    while (y < 512) {
+      x += (Math.random() - 0.45) * 40;
+      y += Math.random() * 35;
+      ctx.lineTo(x, y);
+    }
+    ctx.stroke();
+  }
+
+  const texture = new THREE.CanvasTexture(canvas);
+  texture.wrapS = THREE.RepeatWrapping;
+  texture.wrapT = THREE.RepeatWrapping;
+  texture.repeat.set(1, 1);
+  textureCache['marble_stone'] = texture;
+  return texture;
+}
+
+/**
+ * Procedural bouclé fabric texture
+ */
+export function getBoucleTexture(colorHex = '#F3EFEA'): THREE.CanvasTexture {
+  const key = `boucle_${colorHex}`;
+  if (textureCache[key]) return textureCache[key];
+
+  const canvas = document.createElement('canvas');
+  canvas.width = 256;
+  canvas.height = 256;
+  const ctx = canvas.getContext('2d')!;
+
+  ctx.fillStyle = colorHex;
+  ctx.fillRect(0, 0, 256, 256);
+
+  ctx.fillStyle = 'rgba(120, 110, 100, 0.12)';
+  for (let i = 0; i < 300; i++) {
+    const rx = Math.random() * 256;
+    const ry = Math.random() * 256;
+    const r = 1 + Math.random() * 2.5;
+    ctx.beginPath();
+    ctx.arc(rx, ry, r, 0, Math.PI * 2);
+    ctx.fill();
+  }
+
+  const texture = new THREE.CanvasTexture(canvas);
+  texture.wrapS = THREE.RepeatWrapping;
+  texture.wrapT = THREE.RepeatWrapping;
+  texture.repeat.set(4, 4);
+  textureCache[key] = texture;
+  return texture;
+}
+
+/**
+ * Procedural warm travertine stone texture
+ */
+export function getTravertineTexture(): THREE.CanvasTexture {
+  if (textureCache['travertine_stone']) return textureCache['travertine_stone'];
+
+  const canvas = document.createElement('canvas');
+  canvas.width = 512;
+  canvas.height = 512;
+  const ctx = canvas.getContext('2d')!;
+
+  ctx.fillStyle = '#E8E1D5';
+  ctx.fillRect(0, 0, 512, 512);
+
+  for (let i = 0; i < 35; i++) {
+    const y = i * 15;
+    ctx.fillStyle = 'rgba(180, 165, 145, 0.35)';
+    ctx.fillRect(0, y, 512, 4 + Math.random() * 6);
+  }
+
+  const texture = new THREE.CanvasTexture(canvas);
+  texture.wrapS = THREE.RepeatWrapping;
+  texture.wrapT = THREE.RepeatWrapping;
+  textureCache['travertine_stone'] = texture;
+  return texture;
+}
+

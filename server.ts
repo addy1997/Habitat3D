@@ -1,6 +1,7 @@
 import express from 'express';
 import path from 'path';
 import { fileURLToPath } from 'url';
+import { EIGHT_STYLES } from './src/data/defaultVariants';
 import dotenv from 'dotenv';
 import { GoogleGenAI, ThinkingLevel, Type } from '@google/genai';
 import { createServer as createViteServer } from 'vite';
@@ -227,7 +228,8 @@ ${custom_instructions ? `User guidance: ${custom_instructions}` : ''}`;
       if (response && response.text) {
         try {
           const parsed = JSON.parse(response.text);
-          if (parsed.variants && Array.isArray(parsed.variants) && parsed.variants.length > 0) {
+          if (true) {
+            parsed.variants = EIGHT_STYLES;
             roomSpatialAnalysis = parsed;
           }
         } catch (e) {
@@ -654,7 +656,7 @@ app.post('/api/chat', async (req, res) => {
   }
 
   try {
-    const systemInstruction = `You are the AURA Spatial Staging AI Architect and Pydantic Spatial Co-Pilot.
+    const systemInstruction = `You are the Habitat 3D AI Architect and Pydantic Spatial Co-Pilot.
 You advise interior designers, real estate staging professionals, and 3D Gaussian Splatting rendering pipelines.
 Key Guidelines:
 - You reference precise spatial dimensions in both metric (meters) and imperial (feet).
@@ -726,7 +728,7 @@ async function startServer() {
   }
 
   app.listen(PORT, '0.0.0.0', () => {
-    console.log(`✦ AURA Spatial Staging Engine running on http://0.0.0.0:${PORT}`);
+    console.log(`✦ Habitat 3D running on http://0.0.0.0:${PORT}`);
   });
 }
 

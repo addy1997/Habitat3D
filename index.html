@@ -12,6 +12,16 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  
+    <script>
+      window.addEventListener('error', function(event) {
+        document.body.innerHTML = '<div style="color:red; background:white; padding:20px; font-size: 24px; position:absolute; top:0; left:0; z-index:99999;">ERROR: ' + event.message + '<br><pre>' + event.error.stack + '</pre></div>';
+      });
+      window.addEventListener('unhandledrejection', function(event) {
+        document.body.innerHTML = '<div style="color:red; background:white; padding:20px; font-size: 24px; position:absolute; top:0; left:0; z-index:99999;">PROMISE REJECTION: ' + event.reason + '</div>';
+      });
+    </script>
+
   </head>
   <body class="bg-neutral-950 text-neutral-100 antialiased overflow-hidden selection:bg-cyan-500/20 selection:text-cyan-200">
     <div id="root"></div>

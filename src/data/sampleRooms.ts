@@ -1,4 +1,5 @@
 import { RoomSpatialAnalysis } from '../types';
+import { EIGHT_STYLES } from './defaultVariants';
 import emptySpaceImg from '../assets/images/empty_space_render_1789817909936.jpg';
 import stagedOfficeImg from '../assets/images/staged_office_render_1789817925176.jpg';
 import stagedBedImg from '../assets/images/staged_bed_render_1789817942359.jpg';
@@ -256,3 +257,6 @@ export const SAMPLE_ROOMS: SampleRoom[] = [
     }
   }
 ];
+
+
+SAMPLE_ROOMS.forEach(room => { if (room.initialAnalysis) room.initialAnalysis.variants = EIGHT_STYLES; });

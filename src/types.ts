@@ -8,7 +8,7 @@ export interface FurniturePlacement {
     height_m: number;
     clearance_m: number;
   };
-  category?: 'seating' | 'desk' | 'storage' | 'bed' | 'lighting' | 'decor' | 'crib';
+  category?: 'seating' | 'desk' | 'storage' | 'bed' | 'lighting' | 'decor' | 'crib' | 'table';
 }
 
 export interface StagingVariantPlan {
@@ -31,6 +31,42 @@ export interface RoomImageAngle {
   isPrimary?: boolean;
 }
 
+export interface CameraPose {
+  id: string;
+  name: string;
+  position: [number, number, number]; // [x, y, z] in 3D world space
+  target: [number, number, number]; // [x, y, z] lookAt
+  rotation?: [number, number, number]; // Euler angles
+  fov: number;
+  thumbnailUrl: string;
+  viewpointLabel: string;
+  confidenceScore: number;
+}
+
+export interface NeRFVolumeMetadata {
+  pointCount: number;
+  psnr: number;
+  iterations: number;
+  loss: number;
+  rayMarchSteps: number;
+  hashGridLevels: number;
+  sphericalHarmonicsDegree: number;
+  cameraPoses: CameraPose[];
+  boundingVolume: { width_m: number; height_m: number; depth_m: number };
+  sfmConvergence: string;
+  trainingDurationSec: number;
+}
+
+export interface NeRFRenderSettings {
+  renderMode: 'nerf-radiance' | 'gaussian-splats' | 'depth-field' | 'camera-frustums' | 'photorealistic' | '3d-orbit';
+  splatScale: number;
+  splatOpacity: number;
+  showCameraFrustums: boolean;
+  depthThreshold: number;
+  volumetricDensity: number;
+  viewDependentSH: boolean;
+}
+
 export interface RoomSpatialAnalysis {
   detected_room_type: string;
   estimated_square_footage: number;
@@ -44,6 +80,7 @@ export interface RoomSpatialAnalysis {
     primary_light_source: string;
     flooring_type: string;
   };
+  nerf_metadata?: NeRFVolumeMetadata;
   variants: StagingVariantPlan[];
 }
 
@@ -97,3 +134,4 @@ export interface ChatMessage {
   thoughtProcess?: string;
   modelUsed?: string;
 }
+
